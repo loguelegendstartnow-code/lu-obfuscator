@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LU Obfuscator - Online Code Obfuscator</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      color: white;
+      margin-bottom: 40px;
+    }
+
+    header h1 {
+      font-size: 2.5em;
+      margin-bottom: 10px;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+
+    header p {
+      font-size: 1.1em;
+      opacity: 0.9;
+    }
+
+    .main-content {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    .editor-panel {
+      background: white;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+
+    .editor-panel h2 {
+      color: #667eea;
+      margin-bottom: 15px;
+      font-size: 1.3em;
+    }
+
+    textarea {
+      width: 100%;
+      height: 400px;
+      padding: 15px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      resize: none;
+      transition: border-color 0.3s;
+    }
+
+    textarea:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 10px rgba(102, 126, 234, 0.2);
+    }
+
+    .controls {
+      margin-top: 20px;
+      padding: 20px;
+      background: #f5f5f5;
+      border-radius: 8px;
+    }
+
+    .controls h3 {
+      color: #333;
+      margin-bottom: 15px;
+      font-size: 1.1em;
+    }
+
+    .options-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .option {
+      display: flex;
+      align-items: center;
+    }
+
+    .option input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+      margin-right: 10px;
+      accent-color: #667eea;
+    }
+
+    .option label {
+      cursor: pointer;
+      user-select: none;
+      color: #333;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 10px;
+    }
+
+    button {
+      flex: 1;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 8px;
+      font-size: 1em;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .btn-obfuscate {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    .btn-obfuscate:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-obfuscate:active {
+      transform: translateY(0);
+    }
+
+    .btn-clear {
+      background: #e0e0e0;
+      color: #333;
+    }
+
+    .btn-clear:hover {
+      background: #d0d0d0;
+    }
+
+    .btn-copy {
+      background: #4caf50;
+      color: white;
+      padding: 8px 15px;
+      margin-top: 10px;
+      width: auto;
+    }
+
+    .btn-copy:hover {
+      background: #45a049;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 15px;
+      padding-top: 15px;
+      border-top: 2px solid #e0e0e0;
+    }
+
+    .stat-box {
+      background: white;
+      padding: 10px;
+      border-radius: 6px;
+      text-align: center;
+    }
+
+    .stat-label {
+      font-size: 0.9em;
+      color: #999;
+      margin-bottom: 5px;
+    }
+
+    .stat-value {
+      font-size: 1.3em;
+      color: #667eea;
+      font-weight: bold;
+    }
+
+    .loading {
+      display: none;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .spinner {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #667eea;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .alert {
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      display: none;
+    }
+
+    .alert-success {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+
+    .alert-error {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+
+    .alert.show {
+      display: block;
+    }
+
+    @media (max-width: 768px) {
+      .main-content {
+        grid-template-columns: 1fr;
+      }
+
+      header h1 {
+        font-size: 2em;
+      }
+
+      .options-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .stats {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🔒 LU Obfuscator</h1>
+      <p>Protect your JavaScript code with powerful obfuscation</p>
+    </header>
+
+    <div class="main-content">
+      <!-- Input Panel -->
+      <div class="editor-panel">
+        <h2>📝 Original Code</h2>
+        <textarea id="inputCode" placeholder="Paste your JavaScript code here..."></textarea>
+        
+        <div class="controls">
+          <h3>Options</h3>
+          <div class="options-grid">
+            <div class="option">
+              <input type="checkbox" id="mangleVars" checked>
+              <label for="mangleVars">Mangle Variables</label>
+            </div>
+            <div class="option">
+              <input type="checkbox" id="mangleFunctions" checked>
+              <label for="mangleFunctions">Mangle Functions</label>
+            </div>
+            <div class="option">
+              <input type="checkbox" id="compact">
+              <label for="compact">Compact Code</label>
+            </div>
+            <div class="option">
+              <input type="checkbox" id="encryptStrings">
+              <label for="encryptStrings">Encrypt Strings</label>
+            </div>
+          </div>
+
+          <div class="button-group">
+            <button class="btn-obfuscate" onclick="obfuscateCode()">⚡ Obfuscate</button>
+            <button class="btn-clear" onclick="clearInput()">Clear</button>
+          </div>
+
+          <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Processing...</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Output Panel -->
+      <div class="editor-panel">
+        <h2>🔐 Obfuscated Code</h2>
+        <div id="alertContainer"></div>
+        <textarea id="outputCode" placeholder="Obfuscated code will appear here..." readonly></textarea>
+        
+        <button class="btn-copy" onclick="copyToClipboard()">📋 Copy to Clipboard</button>
+
+        <div class="stats" id="stats" style="display: none;">
+          <div class="stat-box">
+            <div class="stat-label">Original Size</div>
+            <div class="stat-value" id="statOriginal">0 B</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label">Obfuscated Size</div>
+            <div class="stat-value" id="statObfuscated">0 B</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label">Reduction</div>
+            <div class="stat-value" id="statReduction">0%</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer style="text-align: center; color: white; margin-top: 40px; opacity: 0.8;">
+      <p>🚀 LU Obfuscator v1.0.0 | <a href="https://github.com/loguelegendstartnow-code/lu-obfuscator" style="color: white; text-decoration: none;">GitHub</a></p>
+    </footer>
+  </div>
+
+  <script>
+    // Show alert
+    function showAlert(message, type = 'success') {
+      const alertContainer = document.getElementById('alertContainer');
+      const alert = document.createElement('div');
+      alert.className = `alert alert-${type} show`;
+      alert.textContent = message;
+      alertContainer.appendChild(alert);
+
+      setTimeout(() => {
+        alert.remove();
+      }, 3000);
+    }
+
+    // Obfuscate code
+    async function obfuscateCode() {
+      const inputCode = document.getElementById('inputCode').value;
+
+      if (!inputCode.trim()) {
+        showAlert('Please enter some code to obfuscate', 'error');
+        return;
+      }
+
+      const options = {
+        mangleVars: document.getElementById('mangleVars').checked,
+        mangleFunctions: document.getElementById('mangleFunctions').checked,
+        compact: document.getElementById('compact').checked,
+        encryptStrings: document.getElementById('encryptStrings').checked
+      };
+
+      document.getElementById('loading').style.display = 'block';
+
+      try {
+        const response = await fetch('/api/obfuscate', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            code: inputCode,
+            options: options
+          })
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          document.getElementById('outputCode').value = result.obfuscatedCode;
+          
+          // Update stats
+          document.getElementById('statOriginal').textContent = formatBytes(result.originalSize);
+          document.getElementById('statObfuscated').textContent = formatBytes(result.obfuscatedSize);
+          document.getElementById('statReduction').textContent = result.reduction;
+          document.getElementById('stats').style.display = 'grid';
+
+          showAlert('Code obfuscated successfully!', 'success');
+        } else {
+          showAlert('Error: ' + result.error, 'error');
+        }
+      } catch (error) {
+        showAlert('Error: ' + error.message, 'error');
+      } finally {
+        document.getElementById('loading').style.display = 'none';
+      }
+    }
+
+    // Clear input
+    function clearInput() {
+      document.getElementById('inputCode').value = '';
+      document.getElementById('outputCode').value = '';
+      document.getElementById('stats').style.display = 'none';
+    }
+
+    // Copy to clipboard
+    function copyToClipboard() {
+      const outputCode = document.getElementById('outputCode').value;
+      
+      if (!outputCode.trim()) {
+        showAlert('Nothing to copy', 'error');
+        return;
+      }
+
+      navigator.clipboard.writeText(outputCode).then(() => {
+        showAlert('Code copied to clipboard!', 'success');
+      }).catch(err => {
+        showAlert('Failed to copy to clipboard', 'error');
+      });
+    }
+
+    // Format bytes
+    function formatBytes(bytes) {
+      if (bytes === 0) return '0 B';
+      const k = 1024;
+      const sizes = ['B', 'KB', 'MB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + ' ' + sizes[i];
+    }
+
+    // Sample code
+    const sampleCode = `function calculateTotal(items) {
+  let total = 0;
+  for (let item of items) {
+    total += item.price * item.quantity;
+  }
+  return total;
+}`;
+
+    // Load sample on startup
+    document.getElementById('inputCode').value = sampleCode;
+
+    // Keyboard shortcut: Ctrl+Enter to obfuscate
+    document.getElementById('inputCode').addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        obfuscateCode();
+      }
+    });
+  </script>
+</body>
+</html>
