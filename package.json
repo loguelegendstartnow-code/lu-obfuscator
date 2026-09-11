@@ -1,0 +1,48 @@
+{
+  "name": "lu-obfuscator",
+  "version": "1.0.0",
+  "description": "A powerful code obfuscator to encrypt and obfuscate your source code",
+  "main": "server.js",
+  "bin": {
+    "lu-obfuscator": "./cli.js"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "build": "pkg . --targets node16-win-x64 --output lu-obfuscator.exe",
+    "test": "jest",
+    "cli": "node cli.js"
+  },
+  "keywords": [
+    "obfuscator",
+    "obfuscate",
+    "encrypt",
+    "code-protection",
+    "security"
+  ],
+  "author": "loguelegendstartnow-code",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^9.4.1",
+    "crypto": "^1.0.1",
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "jest": "^29.0.0",
+    "pkg": "^5.8.1"
+  },
+  "pkg": {
+    "assets": [
+      "public/**/*"
+    ],
+    "scripts": [
+      "server.js",
+      "index.js",
+      "cli.js"
+    ],
+    "targets": [
+      "node16-win-x64"
+    ],
+    "outputPath": "dist"
+  }
+}
